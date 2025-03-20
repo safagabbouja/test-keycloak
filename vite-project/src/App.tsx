@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import "./App.css";
 import Cars from "./Cars";
+import Admin from "./Admin";
+
 import keycloak from "./keycloak";
 import { ReactKeycloakProvider, useKeycloak } from "@react-keycloak/web";
 
@@ -22,6 +24,8 @@ const SecuredContent = () => {
     <div>
       <h2>Springboot app using Keycloak authentication provider</h2>
       <Cars />
+      <Admin />
+
     </div>
   );
 };

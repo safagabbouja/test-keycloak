@@ -17,4 +17,10 @@ public class MyRestController {
                 new CarEntity("BMW", "black", 24500000L),
                 new CarEntity("Mercedes", "silver", 45000000L));
     }
+
+    @RequestMapping("/admin")
+    @PreAuthorize("hasAuthority('ROLE_admin-role')")
+    public String adminEndpoint(){
+        return "Welcome Admin!";
+    }
 }

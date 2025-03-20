@@ -23,19 +23,31 @@ import java.util.Map;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cars").hasAuthority("ROLE_basic-role")
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http.authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/cars").hasAuthority("ROLE_basic-role")
+//                        .anyRequest().authenticated()
+//                )
+//                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+//                .csrf(csrf -> csrf.disable())
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+//
+//        return http.build();
+//    }
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/cars").hasAuthority("ROLE_view-cars")
+                    .requestMatchers("/admin").hasAuthority("ROLE_admin-role") // Nouvelle règle
+                    .anyRequest().authenticated()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-        return http.build();
-    }
-
+    return http.build();
+}
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -89,9 +101,6 @@ public class SecurityConfig {
             }
         }
     }
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8080/auth/realms/first-realm/protocol/openid-connect/certs").build();
-//    }
+
 
 }
