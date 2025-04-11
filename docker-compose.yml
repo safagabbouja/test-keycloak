@@ -1,35 +1,35 @@
-# Setting up Keycloak with PostgreSQL
-version: "3.1"
+# Setting up Keycloak with PostgreSQL  
+version: "3.1"  
 
-services:
-  keycloak-db:
-    image: postgres:11.4
-    environment:
-      POSTGRES_DB: keycloak_docker  # Nom de la base de données
-      POSTGRES_USER: keycloak       # Utilisateur de la base de données
-      POSTGRES_PASSWORD: keycloak   # Mot de passe de l'utilisateur
-    ports:
-      - "14092:5432"  # Expose le port 5432 de PostgreSQL sur le port 14092 de l'hôte
-    volumes:
-      - keycloak-db:/var/lib/postgresql/data  # Volume pour persister les données de PostgreSQL
+services:  
+  keycloak-db:  
+    image: postgres:11.4  
+    environment:  
+      POSTGRES_DB: keycloak_docker  # Nom de la base de données  
+      POSTGRES_USER: keycloak       # Utilisateur de la base de données  
+      POSTGRES_PASSWORD: keycloak   # Mot de passe de l'utilisateur  
+    ports:  
+      - "14092:5432"  # Expose le port 5432 de PostgreSQL sur le port 14092 de l'hôte  
+    volumes:  
+      - keycloak-db:/var/lib/postgresql/data  # Volume pour persister les données de PostgreSQL  
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.1.0
-    environment:
-      KC_DB: postgres               # Utilise PostgreSQL comme base de données
-      KC_DB_URL_HOST: keycloak-db   # Nom du service PostgreSQL
-      KC_DB_USERNAME: keycloak      # Utilisateur de la base de données
-      KC_DB_PASSWORD: keycloak      # Mot de passe de l'utilisateur
-      KC_DB_URL_PORT: 5432          # Port de la base de données
-      KC_DB_URL_DATABASE: keycloak_docker  # Nom de la base de données
-      KC_BOOTSTRAP_ADMIN_USERNAME: keycloak  # Utilisateur admin de Keycloak
-      KC_BOOTSTRAP_ADMIN_PASSWORD: keycloak  # Mot de passe de l'utilisateur admin
-    command: start-dev  # Démarrer Keycloak en mode développement
-    ports:
-      - "14082:8080"  # Expose le port 8080 de Keycloak sur le port 14082 de l'hôte
-    depends_on:
-      - keycloak-db  # Dépend du service PostgreSQL
-    restart: unless-stopped  # Redémarre automatiquement sauf si arrêté manuellement
+  keycloak:  
+    image: quay.io/keycloak/keycloak:26.1.0  
+    environment:  
+      KC_DB: postgres                # Utilise PostgreSQL comme base de données  
+      KC_DB_URL_HOST: keycloak-db    # Nom du service PostgreSQL  
+      KC_DB_USERNAME: keycloak       # Utilisateur de la base de données  
+      KC_DB_PASSWORD: keycloak       # Mot de passe de l'utilisateur  
+      KC_DB_URL_PORT: 5432           # Port de la base de données  
+      KC_DB_URL_DATABASE: keycloak_docker  # Nom de la base de données  
+      KC_BOOTSTRAP_ADMIN_USERNAME: keycloak  # Utilisateur admin de Keycloak  
+      KC_BOOTSTRAP_ADMIN_PASSWORD: keycloak  # Mot de passe de l'utilisateur admin  
+    command: start-dev  # Démarrer Keycloak en mode développement  
+    ports:  
+      - "14082:8080"  # Expose le port 8080 de Keycloak sur le port 14082 de l'hôte  
+    depends_on:  
+      - keycloak-db  # Dépend du service PostgreSQL  
+    restart: unless-stopped  # Redémarre automatiquement sauf si arrêté manuellement  
 
-volumes:
-  keycloak-db:  # Volume pour persister les données de PostgreSQL
+volumes:  
+  keycloak-db:  # Volume pour persister les données de PostgreSQL  

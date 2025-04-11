@@ -24,7 +24,7 @@ const SecuredContent = () => {
     <div>
       <h2>Springboot app using Keycloak authentication provider</h2>
       <Cars />
-      <Admin />
+      {/* <Admin /> */}
 
     </div>
   );
