@@ -24,27 +24,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;
-//    @Transactional
-//    public StoreDTO createStore(StoreCreationDTO storeCreationDTO, String merchantId) {
-//        // Find the merchant by keycloakId instead of id
-//        User merchant = userRepository.findByKeycloakId(merchantId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Merchant not found with Keycloak ID: " + merchantId));
-//
-//        // Verify that the user is a merchant
-//        if (merchant.getRole() != UserRole.MERCHANT) {
-//            throw new UnauthorizedOperationException("Only merchants can create stores");
-//        }
-//
-//        Store store = Store.createStore(
-//                storeCreationDTO.getName(),
-//                storeCreationDTO.getDescription(),
-//                storeCreationDTO.getAddress(),
-//                merchant
-//        );
-//
-//        Store savedStore = storeRepository.save(store);
-//        return mapToDTO(savedStore);
-//    }
+
 @Transactional
 public StoreDTO createStore(StoreCreationDTO storeCreationDTO, String merchantId) {
     // Find the merchant by keycloakId
@@ -113,7 +93,7 @@ public StoreDTO createStore(StoreCreationDTO storeCreationDTO, String merchantId
                 .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + id));
 
         // Verify that the user is the owner of the store
-        if (!store.getMerchant().getId().equals(merchantId)) {
+        if (!store.getMerchant().getKeycloakId().equals(merchantId)) {
             throw new UnauthorizedOperationException("You can only update your own stores");
         }
 
@@ -131,7 +111,7 @@ public StoreDTO createStore(StoreCreationDTO storeCreationDTO, String merchantId
                 .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + id));
 
         // Verify that the user is the owner of the store
-        if (!store.getMerchant().getId().equals(merchantId)) {
+        if (!store.getMerchant().getKeycloakId().equals(merchantId)) {
             throw new UnauthorizedOperationException("You can only delete your own stores");
         }
 

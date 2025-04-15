@@ -23,7 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;
 
-
+//create user in keycloak and database
    @Transactional
    public UserDTO createUser(UserCreationDTO userCreationDTO) {
       // Check if username or email already exists
@@ -34,7 +34,7 @@ public class UserService {
           throw new ResourceAlreadyExistsException("Email already exists: " + userCreationDTO.getEmail());
       }
 
-      // Create user in Keycloak
+//       Convertit le DTO en entité User utilisable par l’application.
       User user = User.createUser(
               userCreationDTO.getUsername(),
               userCreationDTO.getFirstName(),
@@ -42,7 +42,7 @@ public class UserService {
               userCreationDTO.getEmail(),
               userCreationDTO.getRole()
       );
-
+//create user in keycloak
       String keycloakId = keycloakService.createKeycloakUser(user, userCreationDTO.getPassword());
       user.setKeycloakId(keycloakId); // Set Keycloak ID
       // Save user in database

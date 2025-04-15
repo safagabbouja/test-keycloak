@@ -24,29 +24,29 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
 
-    @Transactional
-    public TransactionDTO createTransaction(TransactionCreationDTO transactionCreationDTO, String customerId) {
-        User customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
+@Transactional
+public TransactionDTO createTransaction(TransactionCreationDTO transactionCreationDTO, String customerId) {
+    // Use findByKeycloakId to fetch the user
+    User customer = userRepository.findByKeycloakId(customerId)
+            .orElseThrow(() -> new ResourceNotFoundException("Customer not found with keycloakId: " + customerId));
 
-        // Verify that the user is a customer
-        if (customer.getRole() != UserRole.CUSTOMER) {
-            throw new UnauthorizedOperationException("Only customers can create transactions");
-        }
-
-        Store store = storeRepository.findById(transactionCreationDTO.getStoreId())
-                .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + transactionCreationDTO.getStoreId()));
-
-        Transaction transaction = Transaction.createTransaction(
-                transactionCreationDTO.getAmount(),
-                transactionCreationDTO.getDescription(),
-                customer,
-                store
-        );
-
-        Transaction savedTransaction = transactionRepository.save(transaction);
-        return mapToDTO(savedTransaction);
+    if (customer.getRole() != UserRole.CUSTOMER) {
+        throw new UnauthorizedOperationException("Only customers can create transactions");
     }
+
+    Store store = storeRepository.findById(transactionCreationDTO.getStoreId())
+            .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + transactionCreationDTO.getStoreId()));
+
+    Transaction transaction = Transaction.createTransaction(
+            transactionCreationDTO.getAmount(),
+            transactionCreationDTO.getDescription(),
+            customer,
+            store
+    );
+
+    Transaction savedTransaction = transactionRepository.save(transaction);
+    return mapToDTO(savedTransaction);
+}
 
     @Transactional(readOnly = true)
     public TransactionDTO getTransactionById(String id, String userId, UserRole role) {

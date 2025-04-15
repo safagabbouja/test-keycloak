@@ -3,6 +3,7 @@ package com.keycloakk.example.keycloak_exemple.Controllers;
 
 import com.keycloakk.example.keycloak_exemple.dtos.UserDTO;
 import com.keycloakk.example.keycloak_exemple.model.UserRole;
+import com.keycloakk.example.keycloak_exemple.services.KeycloakService;
 import com.keycloakk.example.keycloak_exemple.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-
+    private final KeycloakService keycloakService; // Add this field
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
@@ -53,6 +54,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+    // Add this new endpoint
+    @GetMapping("/sync-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> syncUsers() {
+        keycloakService.synchronizeKeycloakUsers();
+        return ResponseEntity.ok("User synchronization completed");
     }
 }
 
