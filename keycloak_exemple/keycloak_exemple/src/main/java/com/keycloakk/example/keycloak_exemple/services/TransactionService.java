@@ -47,16 +47,20 @@ public TransactionDTO createTransaction(TransactionCreationDTO transactionCreati
     Transaction savedTransaction = transactionRepository.save(transaction);
     return mapToDTO(savedTransaction);
 }
-
+// Dans TransactionService
     @Transactional(readOnly = true)
-    public TransactionDTO getTransactionById(String id, String userId, UserRole role) {
+    public TransactionDTO getTransactionById(String id, String keycloakId, UserRole role) {
         Transaction transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
 
-        // Verify that the user has access to this transaction
-        if (role == UserRole.CUSTOMER && !transaction.getCustomer().getId().equals(userId)) {
+        // Récupérer l'utilisateur par son keycloakId
+        User user = userRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with keycloakId: " + keycloakId));
+
+        // Vérifier l'accès
+        if (role == UserRole.CUSTOMER && !transaction.getCustomer().getId().equals(user.getId())) {
             throw new UnauthorizedOperationException("You can only view your own transactions");
-        } else if (role == UserRole.MERCHANT && !transaction.getStore().getMerchant().getId().equals(userId)) {
+        } else if (role == UserRole.MERCHANT && !transaction.getStore().getMerchant().getId().equals(user.getId())) {
             throw new UnauthorizedOperationException("You can only view transactions from your stores");
         }
 
@@ -64,9 +68,9 @@ public TransactionDTO createTransaction(TransactionCreationDTO transactionCreati
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionDTO> getTransactionsByCustomer(String customerId) {
-        User customer = userRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + customerId));
+    public List<TransactionDTO> getTransactionsByCustomer(String keycloakId) {
+        User customer = userRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + keycloakId));
 
         return transactionRepository.findByCustomer(customer).stream()
                 .map(this::mapToDTO)
@@ -79,7 +83,7 @@ public TransactionDTO createTransaction(TransactionCreationDTO transactionCreati
                 .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + storeId));
 
         // Verify that the merchant owns the store
-        if (!store.getMerchant().getId().equals(merchantId)) {
+        if (!store.getMerchant().getKeycloakId().equals(merchantId)) {
             throw new UnauthorizedOperationException("You can only view transactions from your own stores");
         }
 
@@ -94,7 +98,7 @@ public TransactionDTO createTransaction(TransactionCreationDTO transactionCreati
                 .orElseThrow(() -> new ResourceNotFoundException("Store not found with id: " + storeId));
 
         // Verify that the merchant owns the store
-        if (!store.getMerchant().getId().equals(merchantId)) {
+        if (!store.getMerchant().getKeycloakId().equals(merchantId)) {
             throw new UnauthorizedOperationException("You can only view transactions from your own stores");
         }
 
@@ -109,7 +113,7 @@ public TransactionDTO createTransaction(TransactionCreationDTO transactionCreati
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
 
         // Verify that the merchant owns the store associated with the transaction
-        if (!transaction.getStore().getMerchant().getId().equals(merchantId)) {
+        if (!transaction.getStore().getMerchant().getKeycloakId().equals(merchantId)) {
             throw new UnauthorizedOperationException("You can only update transactions from your own stores");
         }
 
